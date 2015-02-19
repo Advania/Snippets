@@ -9,7 +9,6 @@ Here are code example showing basic syntax and tips.
 
 ## Table of Content
 
-* [Table of Content](#table-of-content)
 * [Variable](#variable)
 * [If and Choose](#if-and-choose)
 * [Display text and values with `value-of` element](#display-text-and-values-with-value-of-element)
