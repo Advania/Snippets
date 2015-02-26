@@ -4,7 +4,6 @@
 ## Table of Content
 
 * [XSLT - The basics](xslt/basics.md)
-    * [Table of Content](xslt/basics.md#table-of-content)
     * [Variable](xslt/basics.md#variable)
     * [If and Choose](xslt/basics.md#if-and-choose)
     * [Display text and values with `value-of` element](xslt/basics.md#display-text-and-values-with-value-of-element)
@@ -30,4 +29,5 @@ $ greadme [path/to/some.markdown]
 
 After that the site to `http://localhost:8124/` will start on your default browser and you stop the process by pressing CTRL+C in the cmd
 
+**Plus**: Here is a [Markdown-Cheatsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) if you are not familiar with markdown syntax.
 

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:lisa="lisa:XsltExtensions" xmlns:control="lisa:ControlInfo" exclude-result-prefixes="lisa control" version="1.0" >
+    <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" />
+    <xsl:param name="NewsPageId" />
+    <xsl:param name="ListName" />
+    
+    <xsl:template match="News">
+        
+        <xsl:for-each select="Item">
+            <article class="media">
+                <xsl:if test="NewsImageId != ''">
+                    <figure>
+                        <a href="{NewsUrl}" title="{Title}" class="pull-left">
+                            <img src="{NewsImageUrl}{NewsImageUrl/@npe}proc=100x100" alt="{AltText}" class="media-object" />
+                        </a>
+                    </figure>
+                </xsl:if>
+                <section class="media-body">
+                    <h1 class="media-heading">
+                        <a href="{NewsUrl}" title="{Title}">
+                            <xsl:value-of select="Title" disable-output-escaping="yes" />
+                        </a>
+                    </h1>
+                    <time class="muted"><xsl:value-of select="Start" disable-output-escaping="yes" /></time>
+                    <p><xsl:value-of select="Abstract" disable-output-escaping="yes" /></p>
+                    <a href="{NewsUrl}" class="btn btn-default"><xsl:value-of select="control:Localize('View','MoreText','Loc$ViewGeneral/MoreText')" /></a>
+                </section>
+            </article>
+        </xsl:for-each>
+        
+        <xsl:if test="Paging/TotalRecords != 0">
+            <hr />
+            <ul class="pagination">
+                <xsl:variable name="paging" select="lisa:GeneratePagination(1, 2, 2, 1, Paging/CurrentPage, Paging/TotalRecords, Paging/PageSize, concat($ListName,'_page'))" />
+                <xsl:for-each select="$paging/Item">
+                    <xsl:choose>
+                        <xsl:when test="Type = 'Previous'"><li><a href="{Url}"><xsl:value-of select="control:Localize('View','PreviousPage','Loc$ViewGeneral/PreviousPage')" /></a></li></xsl:when>
+                        <xsl:when test="Type = 'Next'"><li><a href="{Url}"><xsl:value-of select="control:Localize('View','NextPage','Loc$ViewGeneral/NextPage')" /></a></li></xsl:when>
+                        <xsl:when test="Type = 'Current'"><li class="disabled active"><a href="#"><xsl:value-of select="Index" /></a></li></xsl:when>
+                        <xsl:when test="Type = 'Link'"><li><a href="{Url}"><xsl:value-of select="Index" /></a></li></xsl:when>
+                        <xsl:when test="Type = 'Gap'">
+                            <xsl:choose>
+                                <xsl:when test="Url != ''"><li><a href="{Url}"><xsl:value-of select="Index" /></a></li></xsl:when>
+                                <xsl:otherwise><li class="disabled"><a href="#">...</a></li></xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:when>
+                    </xsl:choose>
+                </xsl:for-each>
+            </ul>
+        </xsl:if>
+        
+    </xsl:template>
+</xsl:stylesheet>
