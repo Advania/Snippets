@@ -13,7 +13,7 @@ http://minimamente.com/example/magic_animations/
 Nice menues
 https://scotch.io/demos/body-class-menus-reveal-top
 
-Bounce js (bú til animations)
+Bounce js (búa til animations)
 http://bouncejs.com/
 
 CSS3 Animation Cheat Sheet
