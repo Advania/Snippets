@@ -26,7 +26,8 @@ function domReady () {
             text : 'This is text',
             time : '17:12',
             url : 'www.mbl.is',
-            color : '#ff0000'
+            color : '#ff0000',
+            hidden : ''
         },
         // Special strings if needed
         strings = {
@@ -57,6 +58,9 @@ function domReady () {
                         }
                         else if(elementType === 'radio') {
                             el.checked = types[key];         
+                        }
+                        else if(elementType === 'hidden') {
+                            el.value = el.value;
                         }
                         else  {
                             el.value = types[key];
