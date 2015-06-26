@@ -29,6 +29,11 @@ function domReady () {
             color : '#ff0000',
             hidden : ''
         },
+        
+        classes = {
+            ssn : '1234567890'
+        } 
+        
         // Special strings if needed
         strings = {
             textarea: 'This is textarea',
@@ -41,8 +46,10 @@ function domReady () {
     // Loop through every input and 
     // find corresponding input and autofill it
     Array.prototype.slice.call( inputs ).forEach( function( el, i ) { 
-        var tagName =  el.tagName, 
+        var tagName =  el.tagName,
+            className = el.className,
             elementType = el.getAttribute('type');
+        console.log(className);
         if(tagName === 'SELECT') {
             el.childNodes[0].setAttribute('selected', 'selected')
         }
@@ -62,6 +69,9 @@ function domReady () {
                         else if(elementType === 'hidden') {
                             el.value = el.value;
                         }
+                        else if(className.indexOf('ssn') > -1) {
+                            el.value = classes.ssn;
+                        } 
                         else  {
                             el.value = types[key];
                         }   
