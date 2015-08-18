@@ -1,6 +1,8 @@
 
 // Virkjar datepickerinn svona
 
+// CSS fyrir datepickerinn er svo í css möppunni.
+
 // Datepicker Bootstrap
     $('.datepicker').datepicker({
         format: 'dd.mm.yyyy',
