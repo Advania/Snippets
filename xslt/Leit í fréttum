@@ -1,0 +1,228 @@
+<!--Sama virkni og er á https://www.islandsbanki.is/?pageid=33c6fc7d-0b28-4557-bb33-80c09d1689b9 -->
+
+
+<?xml version="1.0"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:control="lisa:ControlInfo" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:user="http://www.skyrr.com" xmlns:extensions="lisa:XsltExtensions" exclude-result-prefixes="extensions user msxsl control" >
+    
+    <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" />
+    
+    <msxsl:script implements-prefix="user" language="CSharp">
+    <msxsl:assembly name="System.Web"/>
+    <![CDATA[
+        public bool CheckDate(string datefrom, string dateto, string month)
+    	{
+        try{
+    		DateTime fromDate; 
+            if(!DateTime.TryParse(datefrom, out fromDate)){return true;}
+            DateTime toDate; 
+            if(!DateTime.TryParse(dateto, out toDate)){return true;}
+            DateTime theMonth;
+            if(!DateTime.TryParse(month, out theMonth)){return true;}
+            
+            if(fromDate != null && toDate != null && month != null){
+            
+                if(theMonth > fromDate && theMonth <= toDate)
+                {
+                    return true;
+                }
+                else return false;
+            }
+            else return false;
+		    }catch{
+                return false;
+            }
+        }
+	]]>
+	</msxsl:script>
+
+    <xsl:param name="NewsPageId" />
+	<xsl:param name="pageid" />
+    <xsl:param name="pageurl" />
+    <xsl:param name="properties" />
+	<xsl:param name="query-string" />
+
+	<xsl:template match="News">
+        
+        <xsl:variable name="begin">
+            <xsl:choose>
+            	<xsl:when test="$query-string/param[@name='offset'] != ''"><xsl:value-of select="$query-string/param[@name='offset']" /></xsl:when>
+        		<xsl:otherwise>0</xsl:otherwise>
+        	</xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="step">10</xsl:variable>
+        <xsl:variable name="end" select="$begin + $step" />
+        <xsl:variable name="max" select="ceiling(count(Item) div $step)" />
+        <xsl:variable name="current" select="floor($begin div $step)+1" />
+
+        <!-- Setup variables -->
+        <xsl:variable name="items_per_page" select="number(10)" />
+        <xsl:variable name="total_items" select="count(Item)" />
+        <xsl:variable name="total_pages" select="ceiling(total_items div $items_per_page)" />
+        <xsl:variable name="offset" select="number(0)" />
+        <xsl:variable name="columns" select="number($properties/Property[@name = 'columns'])" />
+        <xsl:variable name="column_width" select="floor(12 div $columns)" />
+        
+        <xsl:variable name="fromdate">
+            <xsl:choose>
+                <xsl:when test="$query-string/param[@name='from'] != ''"><xsl:value-of select="$query-string/param[@name='from']" /></xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="todate">
+            <xsl:choose>
+                <xsl:when test="$query-string/param[@name='to'] != ''"><xsl:value-of select="$query-string/param[@name='to']" /></xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="val">
+            <xsl:choose>
+               <xsl:when test="$query-string/param[@name='query'] != ''"><xsl:value-of select="$query-string/param[@name='query']" /></xsl:when>
+                  <xsl:otherwise></xsl:otherwise>   
+            </xsl:choose>
+        </xsl:variable>
+        
+        <!--div class="debug" style="margin-bottom:30px;">
+            <span>fromdate: <xsl:value-of select="$fromdate" /></span> | 
+            <span>todate: <xsl:value-of select="$todate" /></span> |
+            <span>newsCount: <xsl:value-of select="count(Item)" /></span>
+        </div-->
+        
+        <xsl:if test="$properties/Property[@name = 'hideSearchbar'] != 'true'">
+        
+            <form id="refreshForm" class="search-news form-inline well well-frame" method="get" action="/?pageid={$pageid}">
+                <xsl:if test="$properties/Property[@name = 'panelTitle'] != ''">
+                    <h2 class="title"><xsl:value-of select="$properties/Property[@name = 'panelTitle']" /></h2>
+                </xsl:if>
+                <div class="row">
+                    <div class="span5">
+                        <label class="control-label" for="from">
+                           <b>Leitarorð</b>
+                        </label>
+                        <div class="controls">
+                            <div class="with-search-icon">
+                                <i class="ico-search pull-left"></i>
+                                <input type="text" name="query" id="query" value="{$val}" style="width:90%;" placeholder="Titill, eða leitarorð fréttar" />
+                          </div>
+                        </div>
+                    </div>
+                    <div class="span2">
+                        <label class="control-label" for="from">
+                            <b>Tímabil frá</b>
+                        </label>
+                        <div class="input-append date" id="dp1" data-date-format="dd-mm-yyyy">
+                            <input id="calFrom" class="span10" name="from" size="14" type="text" value="{$fromdate}" placeholder="Veldu dags." />
+                            <span class="add-on"><i class="icon-th" style="margin-left: 3px; margin-top: 5px;"></i></span>
+                        </div>
+                    </div>
+                    <div class="span2" >
+                        <label class="control-label" for="to">
+                            <b>Tímabil til</b>
+                        </label>
+                        <div class="input-append date" id="dp2" data-date-format="dd-mm-yyyy">
+                            <input id="calTo" class="span10" name="to" size="14" type="text" value="{$todate}" placeholder="Veldu dags." />
+                            <span class="add-on"><i class="icon-th" style="margin-left: 3px; margin-top: 5px;"></i></span>
+                        </div>
+                    </div>
+                     <div class="span1" style="margin-right:10px;">
+                        <div class="controls">
+                        <label class="control-label" style="margin-bottom:28px;display:block;"></label>
+                            <input id="clearsearch" class="btn btn-inverse" type="button" value="Hreinsa" />
+                        </div>
+                    </div>
+                    <div class="span1">
+                        <div class="controls">
+                        <label class="control-label" style="margin-bottom:28px;display:block;"></label>
+                            <input class="btn btn-inverse" type="submit" value="Leita" />
+                        </div>
+                    </div>
+                    <input type="hidden" name="pageid" value="{$pageid}" />  
+                </div>
+            </form>  
+        </xsl:if>
+<div id="newslist">
+        <ul class="unstyled clearfix" id="newsitems">
+            <xsl:for-each select="Item[contains(translate(.,'AÁBCDÐEÉFGHIÍJKLMNOÓPRSTUÚVWXYÝÞÆÖZ','aábcdðeéfghiíjklmnoóprstuúvwxyýþæöz'),translate($val,'AÁBCDÐEÉFGHIÍJKLMNOÓPRSTUÚVWXYÝÞÆÖZ','aábcdðeéfghiíjklmnoóprstuúvwxyýþæöz'))]">
+                
+                <xsl:variable name="startdate" select="extensions:FormatDate(Start, 'dd MMMM yyy')" />
+                
+                <!-- Group news by their month and year -->
+                <xsl:variable name="month"  select="extensions:FormatDate(Start, 'MMMM yyy')" />
+                
+                <!--xsl:variable name="testmonth" select="extensions:FormatDate(Start, 'MM')" /-->
+                <!--xsl:variable name="preceedingitemdate" select="extensions:FormatDate(//preceding-sibling::Item[1]/Start, 'MM')" /-->
+                <!--xsl:variable name="preceedingitemdate2" select="extensions:FormatDate(//preceding-sibling::Item[2]/Start, 'MM')" /-->
+                
+                
+                <!-- Print header only first time -->
+                <!--xsl:if test="position() = 1">
+                    <xsl:if test="$testmonth != $preceedingitemdate2 ">
+                        
+                        <div class="media-divider">
+                            <h3><xsl:value-of select="$month" /></h3>
+                        </div>
+                    </xsl:if>
+                    <xsl:if test="position() != 1">
+                        <xsl:text disable-output-escaping="yes">&lt;/li&gt;</xsl:text>
+                    </xsl:if>
+                    
+                    <xsl:text disable-output-escaping="yes">&lt;li class="media-list row"&gt;</xsl:text>
+                </xsl:if-->
+                
+                
+                <!-- Print two columns -->
+                <xsl:if test="position() mod 2 = 1">
+                    <xsl:text disable-output-escaping="yes">&lt;/li&gt;&lt;li class="media-list row"&gt;</xsl:text>
+                </xsl:if>            
+                
+                <!-- Group news by their month and year -->
+                <xsl:if test="user:CheckDate($fromdate,$todate,$startdate)">
+                    <div class="media span6">
+                        <h3 class="media-heading">
+                            <a href="{NewsUrl}"><xsl:if test="count(Categories/Category[@name = 'Fræðslufundir']) != 0">VÍB Stofan: </xsl:if><xsl:value-of select="Title" disable-output-escaping="yes" /></a>
+                        </h3>
+                        <div class="muted">
+                            <xsl:value-of select="Start" disable-output-escaping="yes" />
+                        </div>
+                        <div class="media-body">
+                            <xsl:choose>
+                                <xsl:when test="$properties/Property[@name = 'showBody'] = 'false'"><xsl:attribute name="class">hidden</xsl:attribute></xsl:when>
+                                <xsl:when test="Abstract != ''">
+                                    <xsl:value-of select="extensions:ParseAndFixHTML(extensions:CutText(string(Abstract), 150))" disable-output-escaping="yes" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="extensions:ParseAndFixHTML(extensions:CutText(string(Content), 150))" disable-output-escaping="yes" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                		    <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text><a href="{NewsUrl}">Nánar</a>
+                        </div>
+                    </div>
+                </xsl:if>
+            </xsl:for-each>
+            <xsl:text disable-output-escaping="yes">&lt;/li&gt;</xsl:text>
+        </ul>
+</div>        
+
+<xsl:if test="$properties/Property[@name = 'pagination'] = 'false'">
+        <div class="jpages-pagination-container">
+            <div class="news-container"></div>
+        </div>
+</xsl:if>        
+        <script>
+            $(document).ready(function(){
+                <xsl:if test="$val != ''">
+                highl('newsitems','<xsl:value-of select="$val" />');
+                </xsl:if>
+                
+                $('#clearsearch').click(function(){
+                   /* $('#query').val("");
+                    $('#calFrom').val("");
+                    $('#calTo').val("");*/
+                   document.location = 'http://www.islandsbanki.is/?pageid=33c6fc7d-0b28-4557-bb33-80c09d1689b9';
+                    return false;
+                });
+            });
+        </script>
+        
+    </xsl:template>
+   
+</xsl:stylesheet>
