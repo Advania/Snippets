@@ -1,5 +1,5 @@
 <!--Sama virkni og er á https://www.islandsbanki.is/?pageid=33c6fc7d-0b28-4557-bb33-80c09d1689b9 -->
-
+<!--Sama virkni og er á www.sfr.is frétta leitinni þar -->
 
 <?xml version="1.0"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns:control="lisa:ControlInfo" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:user="http://www.skyrr.com" xmlns:extensions="lisa:XsltExtensions" exclude-result-prefixes="extensions user msxsl control" >
